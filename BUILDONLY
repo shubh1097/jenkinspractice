@@ -1,0 +1,15 @@
+pipeline{
+    agent any
+    stages{
+        stage('Git'){
+            steps{
+            git 'https://github.com/shubh1097/sampleProject.git'
+        }
+    }
+    stage('Building with Mvn'){
+        steps{
+            sh 'mvn clean install'
+        }
+    }
+}
+}
