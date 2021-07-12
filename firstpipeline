@@ -1,0 +1,30 @@
+pipeline{
+    agent any
+    
+    stages{
+        stage('Git'){
+            steps{
+            git 'https://github.com/shubh1097/sampleProject.git'
+        }
+    }
+    stage('Building with Mvn'){
+        steps{
+            sh 'mvn clean install'
+        }
+    }
+    stage('Image Creation'){
+        steps{
+            sh 'cp -r ../jenkinspr/webapp/target .'
+            sh 'docker build -t shubhdock123/myimg1.${BUILD_NUMBER} .'
+        }
+    }
+    stage('Pushing to Docker'){
+        steps{
+            withCredentials([string(credentialsId: 'Docker_pass', variable: 'Dockerpswd')]){
+                sh 'docker login -u shubhdock123 -p ${Dockerpswd} docker.io'
+                sh 'docker push shubhdock123/myimg1.${BUILD_NUMBER}'
+            }
+        }
+    }
+}
+}
