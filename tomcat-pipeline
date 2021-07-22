@@ -1,0 +1,30 @@
+pipeline{
+    agent any
+    
+    stages{
+        stage('Git'){
+            steps{
+            git 'https://github.com/shubh1097/sampleProject.git'
+        }
+    }
+    stage('Building with Mvn'){
+        steps{
+            sh 'mvn clean install'
+            }
+    }
+    stage ('Deployment'){
+        steps{
+            sshagent(['tomcat-new']) {
+                sh """
+                scp -o StrictHostKeyChecking=no /var/lib/jenkins/workspace/project2tomcat/webapp/target/webapp.war ubuntu@172.31.40.184:/opt/tomcat8/webapps/
+                
+                ssh ubuntu@172.31.40.184 /opt/tomcat8/bin/shutdown.sh
+              
+                ssh ubuntu@172.31.40.184 /opt/tomcat8/bin/startup.sh
+                
+                """
+                }
+        }
+    }
+    }
+}
